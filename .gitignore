@@ -6,13 +6,5 @@ pipeline/data/raw/
 .DS_Store
 .claude
 .mcp.json
-package-lock.json
-package.json
-tsconfig.app.json
-tsconfig.json
-tsconfig.node.json
-vite.config.ts
-eslint.config.js
-docs/superpowers
 # downloaded datasets (large, not committed)
 /data/
