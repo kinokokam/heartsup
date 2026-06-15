@@ -1,9 +1,23 @@
 # heartsup Sub-project 0 — Resume Notes
 
-**Paused:** 2026-06-15. Branch: `feat/foundation-data-pipeline`.
+**Status: COMPLETE (15/15)** as of 2026-06-15. Branch: `feat/foundation-data-pipeline`.
 **Plan:** [2026-06-15-heartsup-foundation.md](2026-06-15-heartsup-foundation.md)
 
-## Status: 10 of 15 tasks complete
+## Completion summary
+All tasks done. Datasets were placed in repo-root `data/` (gitignored). The POS dataset
+turned out to be **per-POS files** (`verbs.csv`/`nouns.csv`/`adjectives.csv`, headerless,
+word in col 0), not a single `[word, pos]` file — so `run.ts` reads per file, cleans
+(pure-alpha, len 3–12), caps + even-samples (nouns→600, adj→400), and dedupes the **46**
+unique slang terms. Seeding filters degenerate same-stem combos. A grants migration
+(`0005_grants.sql`) was needed so `service_role` could write the tables. Final DB:
+`pos_words=1172`, `slang_words=46`, `word_pairs=3427`, `word_triples=848`. Coherence ranks
+sensibly (`cut/slice` 0.70 ≫ `cost/mobile` 0.27). 18 app + 13 pipeline tests pass; app builds.
+
+Follow-ups for later: common-word frequency filter to remove archaic junk nouns; RLS policies
+(Sub-project 1); sync exact Figma token values when building real screens.
+
+---
+## Historical (mid-build pause point): 10 of 15 tasks complete
 
 ### ✅ Done & committed
 - **Task 1** Scaffold (Vite + React 19 + TS). Note: stack resolved to **Vite 8 / rolldown-vite**.
