@@ -69,3 +69,4 @@ cd pipeline && npm test   # pipeline tests only
 - Multiplayer tables have no RLS policies yet — added with Auth in Sub-project 1.
 - Design tokens (`src/theme/tokens.ts`) are approximated from the Figma export; sync exact
   values via the Figma MCP when building real screens.
+
