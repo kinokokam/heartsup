@@ -1,0 +1,15 @@
+{
+    "mcpServers": {
+      "supabase": {
+        "type": "http",
+        "url": "https://mcp.supabase.com/mcp"
+      },
+      "kaggle": {
+        "command": "npx",
+        "args": [
+          "mcp-remote",
+          "https://www.kaggle.com/mcp"
+        ]
+      }
+    }
+  }
