@@ -12,6 +12,7 @@ tsconfig.app.json
 tsconfig.json
 tsconfig.node.json
 vite.config.ts
-
+eslint.config.js
+docs/superpowers
 # downloaded datasets (large, not committed)
 /data/
