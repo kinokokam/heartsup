@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
+import { parseCsvLine } from "./clean";
 import { embed } from "./embed";
 import { topKPairs, topKTriples, type Word } from "./seed";
 import {
@@ -33,6 +34,8 @@ function cleanColumn0(file: string): string[] {
   const seen = new Set<string>();
   const out: string[] = [];
   for (const line of text.split("\n")) {
+    // split(",")[0] is fine here: the strict a–z regex below also rejects any
+    // CSV-quoting artifact (a leading stray quote on a quoted multi-word entry).
     const w = (line.split(",")[0] ?? "").trim().toLowerCase();
     if (!/^[a-z]+$/.test(w)) continue;
     if (w.length < 3 || w.length > 12) continue;
@@ -43,32 +46,39 @@ function cleanColumn0(file: string): string[] {
   return out;
 }
 
-// Two words are "degenerate" together if they're the same word or share a stem
-// (e.g. grind/grinder, shake/shaker, sew/sewing) — MiniLM scores these near 1.0
-// but they make dull scenarios ("you wear a wearer"). Drop them from the seed.
+// Two words are "degenerate" together if they're the same word or one is a simple
+// inflection of the other (grind/grinder, shake/shaker, sew/sewing) — MiniLM scores
+// these near 1.0 but they make dull scenarios ("you wear a wearer"). We only treat a
+// shared prefix as degenerate when the remainder is a common English suffix, so
+// genuinely different words that happen to share a prefix (cat/catalog) are kept.
+const INFLECTION_SUFFIXES = ["s", "es", "ed", "d", "ing", "er", "ers", "ling", "y"];
 function degenerate(a: string, b: string): boolean {
   if (a === b) return true;
   const [short, long] = a.length <= b.length ? [a, b] : [b, a];
-  return short.length >= 3 && long.startsWith(short);
+  if (short.length < 3 || !long.startsWith(short)) return false;
+  return INFLECTION_SUFFIXES.includes(long.slice(short.length));
 }
 
 // Evenly sample across a sorted list so a cap still spans the alphabet.
 function sampleEvenly<T>(arr: T[], cap: number): T[] {
   if (arr.length <= cap) return arr;
-  const stride = arr.length / cap;
+  // Spread indices across the full range inclusive of the last element.
   const out: T[] = [];
-  for (let i = 0; i < cap; i++) out.push(arr[Math.floor(i * stride)]);
+  for (let i = 0; i < cap; i++) {
+    out.push(arr[Math.round((i * (arr.length - 1)) / (cap - 1))]);
+  }
   return out;
 }
 
 // Slang CSV: dedupe to unique slang_term (col 2) with its first meaning (col 4).
-// Columns 0–3 are comma-free, so col index is reliable up to the meaning.
+// The meaning column contains embedded commas, so parse quote-aware, not split(",").
 function readSlang(): { term: string; meaning: string }[] {
   const text = readFileSync(resolve(DATA, "genz_slang_usage_2020_2025.csv"), "utf8");
   const lines = text.split("\n");
   const seen = new Map<string, string>();
   for (let i = 1; i < lines.length; i++) {
-    const cols = lines[i].split(",");
+    if (!lines[i]) continue;
+    const cols = parseCsvLine(lines[i]);
     const term = (cols[2] ?? "").trim().toLowerCase();
     if (!term || seen.has(term)) continue;
     seen.set(term, (cols[4] ?? "").trim());
