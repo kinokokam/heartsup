@@ -11,7 +11,8 @@ import { PlayMenu } from "./screens/PlayMenu";
 import { CreateLobby } from "./screens/CreateLobby";
 import { JoinLobby } from "./screens/JoinLobby";
 import { LobbyRoom } from "./screens/LobbyRoom";
-import { GameStub } from "./screens/GameStub";
+import { GamePlay } from "./screens/GamePlay";
+import { Leaderboard } from "./screens/Leaderboard";
 
 export function AppRoutes() {
   return (
@@ -27,7 +28,8 @@ export function AppRoutes() {
       <Route path="/lobby/new" element={<RequireAuth><RequireProfile><CreateLobby /></RequireProfile></RequireAuth>} />
       <Route path="/lobby/join" element={<RequireAuth><RequireProfile><JoinLobby /></RequireProfile></RequireAuth>} />
       <Route path="/lobby/:id" element={<RequireAuth><RequireProfile><LobbyRoom /></RequireProfile></RequireAuth>} />
-      <Route path="/game/:id" element={<RequireAuth><RequireProfile><GameStub /></RequireProfile></RequireAuth>} />
+      <Route path="/game/:id" element={<RequireAuth><RequireProfile><GamePlay /></RequireProfile></RequireAuth>} />
+      <Route path="/game/:id/results" element={<RequireAuth><RequireProfile><Leaderboard /></RequireProfile></RequireAuth>} />
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );
