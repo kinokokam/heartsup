@@ -15,12 +15,12 @@ vi.mock("react-router-dom", async (orig) => ({ ...(await orig<typeof import("rea
 import { CreateLobby } from "./CreateLobby";
 
 describe("CreateLobby", () => {
-  it("creates a lobby with the chosen mode and navigates to the room", async () => {
+  it("creates a lobby with the chosen mode + duration and navigates to the room", async () => {
     createLobby.mockResolvedValue("L9");
     render(<MemoryRouter><CreateLobby /></MemoryRouter>);
     await userEvent.click(screen.getByRole("button", { name: /medium/i }));
     await userEvent.click(screen.getByRole("button", { name: /create lobby/i }));
-    expect(createLobby).toHaveBeenCalledWith("medium");
+    expect(createLobby).toHaveBeenCalledWith("medium", 300);
     expect(navigate).toHaveBeenCalledWith("/lobby/L9");
   });
   it("shows a friendly error when create fails", async () => {

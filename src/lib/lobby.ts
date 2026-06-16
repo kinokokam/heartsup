@@ -53,8 +53,8 @@ export function lobbyErrorMessage(e: unknown): string {
   return "Something went wrong. Please try again.";
 }
 
-export async function createLobby(mode: LobbyMode): Promise<string> {
-  const { data, error } = await supabase.rpc("create_lobby", { p_mode: mode });
+export async function createLobby(mode: LobbyMode, durationSeconds = 300): Promise<string> {
+  const { data, error } = await supabase.rpc("create_lobby", { p_mode: mode, p_duration_seconds: durationSeconds });
   if (error) throwRpc(error);
   return data as string;
 }

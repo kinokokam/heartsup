@@ -11,9 +11,16 @@ const MODES: { value: LobbyMode; label: string; hint: string }[] = [
   { value: "hard", label: "Hard", hint: "adjective + noun + verb" },
 ];
 
+const DURATIONS: { value: number; label: string }[] = [
+  { value: 180, label: "3 min" },
+  { value: 300, label: "5 min" },
+  { value: 600, label: "10 min" },
+];
+
 export function CreateLobby() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<LobbyMode>("easy");
+  const [duration, setDuration] = useState(300);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,7 +28,7 @@ export function CreateLobby() {
     setBusy(true);
     setError(null);
     try {
-      const id = await createLobby(mode);
+      const id = await createLobby(mode, duration);
       navigate(`/lobby/${id}`);
     } catch (e) {
       setBusy(false);
@@ -52,6 +59,28 @@ export function CreateLobby() {
             }}
           >
             {m.label} <span style={{ opacity: 0.7, fontWeight: 400 }}>— {m.hint}</span>
+          </button>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: tokens.space[2] }}>
+        {DURATIONS.map((d) => (
+          <button
+            key={d.value}
+            type="button"
+            aria-pressed={duration === d.value}
+            onClick={() => setDuration(d.value)}
+            style={{
+              padding: tokens.space[2],
+              borderRadius: tokens.radius.md,
+              border: duration === d.value ? `3px solid ${tokens.color.accent}` : "3px solid transparent",
+              background: duration === d.value ? tokens.color.primary : "rgba(255,255,255,0.08)",
+              color: tokens.color.text,
+              fontFamily: tokens.font.family,
+              fontWeight: tokens.font.weightBold,
+              cursor: "pointer",
+            }}
+          >
+            {d.label}
           </button>
         ))}
       </div>
