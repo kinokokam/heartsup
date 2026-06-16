@@ -6,8 +6,8 @@ friends improvise a scenario from drawn keywords. Tilt **up** = guessed it (poin
 pass. Keyword combos come from an adaptive, community-trained coherence engine.
 
 This repo currently contains **Sub-project 0: Foundation & data pipeline**, **Sub-project 1:
-Auth + Profile + Game codes**, and **Sub-project 2: Lobby & Realtime**. See the design and plans
-under [`docs/superpowers/`](docs/superpowers/).
+Auth + Profile + Game codes**, **Sub-project 2: Lobby & Realtime**, and **Sub-project 3: Core
+Game Loop**. See the design and plans under [`docs/superpowers/`](docs/superpowers/).
 
 ## Stack
 
@@ -84,6 +84,22 @@ updates via Supabase **Postgres Changes**, and online/offline status via Supabas
 3. User A sees user B appear in the roster live, each with a green online dot.
 4. With 2+ players, A taps **Start game** → both sessions land on the "Game starting…" screen.
 5. From a fresh lobby, A tapping **Leave** closes it and bounces B back Home.
+
+## Sub-project 3: Core Game Loop
+
+From the lobby, the host starts a timed game. Turns rotate by join order; the active guesser's
+phone shows a hidden 1–10 rating + keyword(s) (held to the forehead) and reads tilt — up = correct
+(+1), down = pass — drawing card after card until the per-turn timer ends, then the turn rotates.
+When the host-picked total timer runs out, everyone lands on the leaderboard. Game state lives in
+`security definer` RPCs; the client never writes game tables. Keyword text is resolved server-side
+into `rounds.keywords` (the lexicon tables aren't client-readable).
+
+### Manual smoke test (two browser sessions)
+1. Host: Play → Host a game → pick a mode + a short duration (3 min) → Create lobby.
+2. Guest: join by code; host taps Start.
+3. The guesser's screen shows a big rating + keyword(s); tap Correct/Pass (or tilt on a phone).
+   Scores update live on both screens; the spectator sees "X is guessing".
+4. When the timer expires, both land on the leaderboard with the winner highlighted.
 
 ## Tests
 
