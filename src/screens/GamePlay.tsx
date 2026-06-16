@@ -42,8 +42,11 @@ export function GamePlay() {
   useEffect(() => {
     if (status !== "playing") return;
     if (gameLeft <= 0) { finishGame(id).catch(() => {}); return; }
-    if (turnLeft <= 0 && isMyTurn) { advanceTurn(id).catch(() => {}); }
-  }, [status, gameLeft, turnLeft, isMyTurn, id]);
+    // Any member advances when the turn timer expires — not just the guesser — so a
+    // disconnected guesser can't stall the game. advance_turn is server-validated
+    // (rejects before turn_ends_at) and idempotent, so concurrent callers converge.
+    if (turnLeft <= 0) { advanceTurn(id).catch(() => {}); }
+  }, [status, gameLeft, turnLeft, id]);
 
   if (loading) return <ScreenBackground><p>Loading…</p></ScreenBackground>;
 
