@@ -4,7 +4,5 @@ dist/
 .env.local
 pipeline/data/raw/
 .DS_Store
-.claude
-.mcp.json
 # downloaded datasets (large, not committed)
 /data/

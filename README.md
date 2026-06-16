@@ -5,8 +5,9 @@ on their own phone; one player at a time holds a hidden 1–10 rating to their f
 friends improvise a scenario from drawn keywords. Tilt **up** = guessed it (point), **down** =
 pass. Keyword combos come from an adaptive, community-trained coherence engine.
 
-This repo currently contains **Sub-project 0: Foundation & data pipeline**. See the design and
-plans under [`docs/superpowers/`](docs/superpowers/).
+This repo currently contains **Sub-project 0: Foundation & data pipeline** and **Sub-project 1:
+Auth + Profile + Game codes**. See the design and plans under
+[`docs/superpowers/`](docs/superpowers/).
 
 ## Stack
 
@@ -54,6 +55,20 @@ the lexicon upserts on conflict and the coherence tables are reseeded each run.
 **Tuning** (constants at the top of `pipeline/src/run.ts`): `NOUN_CAP`, `ADJ_CAP`,
 `TOP_K_PAIR`, and the triple-seed subset sizes (`T_ADJ`/`T_NOUN`/`T_VERB`, `TOP_K_TRIPLE`).
 Caps keep local embedding + the cartesian triple seed tractable and curate a fun vocabulary.
+
+## Sub-project 1: Auth + Profile + Game codes
+
+Run the app (`npm run dev`) with local Supabase up. Magic-link emails are captured by the local
+**Mailpit** inbox at http://127.0.0.1:54424 (no real email is sent in local dev).
+
+### Manual smoke test
+
+1. Visit http://localhost:5173 → redirected to `/login`.
+2. Enter an email, "Send me a link" → `/check-email`.
+3. Open Mailpit (http://127.0.0.1:54424), open the newest email, click the magic link.
+4. First time → `/setup`: enter a name, pick an emoji, "Let's play" → `/home`.
+5. Open "My Profile" → your 6-char game code shows with a Copy button.
+6. "Log out" → back to `/login`. Logging in again issues a NEW game code.
 
 ## Tests
 
