@@ -7,8 +7,12 @@ const onAuthStateChange = vi.fn((_cb: unknown) => ({ data: { subscription: { uns
 const signInWithOtp = vi.fn();
 const signOut = vi.fn();
 
+const setAuth = vi.fn();
 vi.mock("../lib/supabaseClient", () => ({
-  supabase: { auth: { getSession: () => getSession(), onAuthStateChange: (cb: unknown) => onAuthStateChange(cb), signInWithOtp: (a: unknown) => signInWithOtp(a), signOut: () => signOut() } },
+  supabase: {
+    auth: { getSession: () => getSession(), onAuthStateChange: (cb: unknown) => onAuthStateChange(cb), signInWithOtp: (a: unknown) => signInWithOtp(a), signOut: () => signOut() },
+    realtime: { setAuth: (t: unknown) => setAuth(t) },
+  },
 }));
 const getProfile = vi.fn();
 const clearGameCode = vi.fn();
