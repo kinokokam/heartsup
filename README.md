@@ -5,9 +5,9 @@ on their own phone; one player at a time holds a hidden 1–10 rating to their f
 friends improvise a scenario from drawn keywords. Tilt **up** = guessed it (point), **down** =
 pass. Keyword combos come from an adaptive, community-trained coherence engine.
 
-This repo currently contains **Sub-project 0: Foundation & data pipeline** and **Sub-project 1:
-Auth + Profile + Game codes**. See the design and plans under
-[`docs/superpowers/`](docs/superpowers/).
+This repo currently contains **Sub-project 0: Foundation & data pipeline**, **Sub-project 1:
+Auth + Profile + Game codes**, and **Sub-project 2: Lobby & Realtime**. See the design and plans
+under [`docs/superpowers/`](docs/superpowers/).
 
 ## Stack
 
@@ -69,6 +69,21 @@ Run the app (`npm run dev`) with local Supabase up. Magic-link emails are captur
 4. First time → `/setup`: enter a name, pick an emoji, "Let's play" → `/home`.
 5. Open "My Profile" → your 6-char game code shows with a Copy button.
 6. "Log out" → back to `/login`. Logging in again issues a NEW game code.
+
+## Sub-project 2: Lobby & Realtime
+
+Host or join a waiting-room lobby by code, see a live roster, and have the host start the game.
+Lobby reads use member-only RLS; all writes go through `security definer` RPCs. The roster
+updates via Supabase **Postgres Changes**, and online/offline status via Supabase **Presence**.
+
+### Manual smoke test (two browser sessions)
+1. Log in as user A (host), set up a profile. On Home tap **Play → Host a game**, pick a mode,
+   **Create lobby**. Note the 6-char code on the lobby screen.
+2. In a second browser (or private window), log in as user B (guest), set up a profile.
+   **Play → Join a game**, enter A's code, **Join**.
+3. User A sees user B appear in the roster live, each with a green online dot.
+4. With 2+ players, A taps **Start game** → both sessions land on the "Game starting…" screen.
+5. From a fresh lobby, A tapping **Leave** closes it and bounces B back Home.
 
 ## Tests
 

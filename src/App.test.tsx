@@ -23,4 +23,9 @@ describe("App routes", () => {
     render(<MemoryRouter initialEntries={["/home"]}><AppRoutes /></MemoryRouter>);
     expect(screen.getByRole("button", { name: /send me a link/i })).toBeInTheDocument();
   });
+  it("shows the Play menu at /play for an authed, profiled user", () => {
+    auth.mockReturnValue(base({ session: { user: { id: "u1" } } as never, profile: { id: "u1", display_name: "Q", avatar: "😀", current_game_code: "ABC234" } }));
+    render(<MemoryRouter initialEntries={["/play"]}><AppRoutes /></MemoryRouter>);
+    expect(screen.getByRole("button", { name: /host a game/i })).toBeInTheDocument();
+  });
 });
