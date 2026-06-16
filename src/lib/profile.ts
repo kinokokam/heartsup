@@ -20,8 +20,12 @@ export async function getProfile(): Promise<Profile | null> {
 }
 
 export async function updateProfile(patch: { display_name?: string; avatar?: string }): Promise<void> {
-  // RLS scopes the update to the caller's own row.
-  const { error } = await supabase.from("profiles").update(patch);
+  // `sql_safe_updates` is on for the PostgREST connection, so an UPDATE with no WHERE
+  // clause is rejected *before* RLS is consulted — we must filter by the caller's id.
+  // getSession() reads the cached session locally (no network round-trip).
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("not authenticated");
+  const { error } = await supabase.from("profiles").update(patch).eq("id", session.user.id);
   if (error) throw error;
 }
 
