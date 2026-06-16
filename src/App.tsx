@@ -7,6 +7,11 @@ import { ProfileSetup } from "./screens/ProfileSetup";
 import { Home } from "./screens/Home";
 import { Profile } from "./screens/Profile";
 import { HowToPlay } from "./screens/HowToPlay";
+import { PlayMenu } from "./screens/PlayMenu";
+import { CreateLobby } from "./screens/CreateLobby";
+import { JoinLobby } from "./screens/JoinLobby";
+import { LobbyRoom } from "./screens/LobbyRoom";
+import { GameStub } from "./screens/GameStub";
 
 export function AppRoutes() {
   return (
@@ -18,6 +23,11 @@ export function AppRoutes() {
       <Route path="/home" element={<RequireAuth><RequireProfile><Home /></RequireProfile></RequireAuth>} />
       <Route path="/profile" element={<RequireAuth><RequireProfile><Profile /></RequireProfile></RequireAuth>} />
       <Route path="/how-to-play" element={<RequireAuth><RequireProfile><HowToPlay /></RequireProfile></RequireAuth>} />
+      <Route path="/play" element={<RequireAuth><RequireProfile><PlayMenu /></RequireProfile></RequireAuth>} />
+      <Route path="/lobby/new" element={<RequireAuth><RequireProfile><CreateLobby /></RequireProfile></RequireAuth>} />
+      <Route path="/lobby/join" element={<RequireAuth><RequireProfile><JoinLobby /></RequireProfile></RequireAuth>} />
+      <Route path="/lobby/:id" element={<RequireAuth><RequireProfile><LobbyRoom /></RequireProfile></RequireAuth>} />
+      <Route path="/game/:id" element={<RequireAuth><RequireProfile><GameStub /></RequireProfile></RequireAuth>} />
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );

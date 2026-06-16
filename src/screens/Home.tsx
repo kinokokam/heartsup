@@ -13,7 +13,7 @@ export function Home() {
         <span style={{ fontWeight: tokens.font.weightBold }}>{profile?.display_name}</span>
       </div>
       <h1 style={{ fontSize: 56, margin: 0 }}>Hearts UP!</h1>
-      <Button disabled>Play (coming soon)</Button>
+      <Link to="/play"><Button>Play</Button></Link>
       <Link to="/profile"><Button>My Profile</Button></Link>
       <Link to="/how-to-play"><Button>How to Play</Button></Link>
     </ScreenBackground>
