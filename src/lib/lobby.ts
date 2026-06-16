@@ -10,6 +10,7 @@ export interface Lobby {
   mode: LobbyMode;
   status: LobbyStatus;
   game_ends_at: string | null;
+  turn_ends_at: string | null;
 }
 
 export interface LobbyPlayer {
@@ -78,7 +79,7 @@ export async function startGame(lobbyId: string): Promise<void> {
 export async function getLobby(lobbyId: string): Promise<Lobby | null> {
   const { data, error } = await supabase
     .from("lobbies")
-    .select("id, code, host_id, mode, status, game_ends_at")
+    .select("id, code, host_id, mode, status, game_ends_at, turn_ends_at")
     .eq("id", lobbyId)
     .maybeSingle();
   if (error) throw error;

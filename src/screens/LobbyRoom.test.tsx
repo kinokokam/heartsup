@@ -16,7 +16,7 @@ vi.mock("react-router-dom", async (orig) => ({ ...(await orig<typeof import("rea
 import { LobbyRoom } from "./LobbyRoom";
 
 function state(over: Partial<LobbyState>): LobbyState {
-  return { loading: false, lobby: { id: "L1", code: "ABC234", host_id: "u1", mode: "easy", status: "waiting", game_ends_at: null }, players: [], onlineIds: new Set(), ...over };
+  return { loading: false, lobby: { id: "L1", code: "ABC234", host_id: "u1", mode: "easy", status: "waiting", game_ends_at: null, turn_ends_at: null }, players: [], onlineIds: new Set(), ...over };
 }
 const p = (id: string, name: string) => ({ lobby_id: "L1", profile_id: id, joined_at: id, score: 0, display_name: name, avatar: "😀" });
 
@@ -45,7 +45,7 @@ describe("LobbyRoom", () => {
     expect(screen.getByRole("button", { name: /start game/i })).toBeDisabled();
   });
   it("navigates to the game screen when status becomes playing", () => {
-    useLobby.mockReturnValue(state({ lobby: { id: "L1", code: "ABC234", host_id: "u1", mode: "easy", status: "playing", game_ends_at: null }, players: [p("u1", "Q"), p("u2", "R")] }));
+    useLobby.mockReturnValue(state({ lobby: { id: "L1", code: "ABC234", host_id: "u1", mode: "easy", status: "playing", game_ends_at: null, turn_ends_at: null }, players: [p("u1", "Q"), p("u2", "R")] }));
     render(<MemoryRouter><LobbyRoom /></MemoryRouter>);
     expect(navigate).toHaveBeenCalledWith("/game/L1");
   });
