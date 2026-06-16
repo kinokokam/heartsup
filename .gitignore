@@ -2,5 +2,7 @@ node_modules/
 dist/
 .env
 .env.local
+pipeline/data/raw/
+.DS_Store
 # downloaded datasets (large, not committed)
 /data/
