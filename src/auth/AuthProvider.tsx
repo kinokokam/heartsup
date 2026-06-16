@@ -20,6 +20,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { data } = await supabase.auth.getSession();
         if (!active) return;
         setSession(data.session);
+        // Authenticate the Realtime socket with the user's JWT. Without this it stays on
+        // the anon key, and RLS-gated postgres_changes (e.g. the live lobby roster) are
+        // never delivered. supabase-js does not wire this automatically.
+        supabase.realtime.setAuth(data.session?.access_token ?? null);
         if (data.session) setProfile(await getProfile());
       } catch {
         // Degrade gracefully: an unreachable profile shouldn't trap the user
@@ -31,6 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })();
     const { data: sub } = supabase.auth.onAuthStateChange(async (_e, newSession) => {
       setSession(newSession);
+      supabase.realtime.setAuth(newSession?.access_token ?? null);
       try {
         setProfile(newSession ? await getProfile() : null);
       } catch {

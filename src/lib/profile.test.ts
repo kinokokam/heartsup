@@ -2,18 +2,25 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const maybeSingle = vi.fn();
 const select = vi.fn(() => ({ maybeSingle }));
-const update = vi.fn(() => ({ error: null }));
+const eq = vi.fn(() => ({ error: null }));
+const update = vi.fn(() => ({ eq }));
 const from = vi.fn((..._a: unknown[]) => ({ select, update }));
 const rpc = vi.fn();
+const getSession = vi.fn();
 
 vi.mock("./supabaseClient", () => ({
-  supabase: { from: (...a: unknown[]) => from(...a), rpc: (...a: unknown[]) => rpc(...a) },
+  supabase: {
+    from: (...a: unknown[]) => from(...a),
+    rpc: (...a: unknown[]) => rpc(...a),
+    auth: { getSession: () => getSession() },
+  },
 }));
 
 import { getProfile, updateProfile, assignGameCode, clearGameCode } from "./profile";
 
 beforeEach(() => {
   vi.clearAllMocks();
+  getSession.mockResolvedValue({ data: { session: { user: { id: "u1" } } } });
 });
 
 describe("profile", () => {
@@ -38,8 +45,9 @@ describe("profile", () => {
     await clearGameCode();
     expect(rpc).toHaveBeenCalledWith("clear_game_code");
   });
-  it("updateProfile patches the current user's row", async () => {
+  it("updateProfile patches the current user's row, filtered by id", async () => {
     await updateProfile({ display_name: "Newt", avatar: "🦄" });
     expect(update).toHaveBeenCalledWith({ display_name: "Newt", avatar: "🦄" });
+    expect(eq).toHaveBeenCalledWith("id", "u1");
   });
 });
