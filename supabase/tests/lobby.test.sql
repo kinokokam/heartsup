@@ -22,7 +22,7 @@ begin
 
   -- Host creates a lobby; its code is the host's personal game code.
   perform set_config('request.jwt.claims', json_build_object('sub', h)::text, true);
-  v_lobby := public.create_lobby('easy');
+  v_lobby := public.create_lobby('easy', 300);
   if (select code from public.lobbies where id = v_lobby) <> 'HOST01' then
     raise exception 'expected lobby code = host game code';
   end if;
@@ -95,7 +95,7 @@ begin
 
   -- Host creates (1 player), then 7 guests join → 8 total (the cap).
   perform set_config('request.jwt.claims', json_build_object('sub', host)::text, true);
-  v_lobby := public.create_lobby('easy');
+  v_lobby := public.create_lobby('easy', 300);
   foreach gu in array guests loop
     perform set_config('request.jwt.claims', json_build_object('sub', gu)::text, true);
     perform public.join_lobby('CAP001');

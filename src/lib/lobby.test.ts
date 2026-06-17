@@ -20,10 +20,10 @@ import {
 beforeEach(() => { vi.clearAllMocks(); });
 
 describe("lobby data access", () => {
-  it("createLobby calls the RPC with the mode and returns the id", async () => {
+  it("createLobby calls the RPC with the mode + default duration and returns the id", async () => {
     rpc.mockResolvedValue({ data: "L1", error: null });
     const id = await createLobby("medium");
-    expect(rpc).toHaveBeenCalledWith("create_lobby", { p_mode: "medium" });
+    expect(rpc).toHaveBeenCalledWith("create_lobby", { p_mode: "medium", p_duration_seconds: 300 });
     expect(id).toBe("L1");
   });
   it("joinLobby calls the RPC with the code and returns the id", async () => {

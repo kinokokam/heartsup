@@ -5,6 +5,7 @@ import type { AuthState } from "./auth/useAuth";
 
 const auth = vi.fn<() => AuthState>();
 vi.mock("./auth/useAuth", async (orig) => ({ ...(await orig<typeof import("./auth/useAuth")>()), useAuth: () => auth() }));
+vi.mock("./lib/game", () => ({ getScores: () => Promise.resolve([]) }));
 
 import { AppRoutes } from "./App";
 
@@ -27,5 +28,10 @@ describe("App routes", () => {
     auth.mockReturnValue(base({ session: { user: { id: "u1" } } as never, profile: { id: "u1", display_name: "Q", avatar: "😀", current_game_code: "ABC234" } }));
     render(<MemoryRouter initialEntries={["/play"]}><AppRoutes /></MemoryRouter>);
     expect(screen.getByRole("button", { name: /host a game/i })).toBeInTheDocument();
+  });
+  it("renders the results route for an authed, profiled user", () => {
+    auth.mockReturnValue(base({ session: { user: { id: "u1" } } as never, profile: { id: "u1", display_name: "Q", avatar: "😀", current_game_code: "ABC234" } }));
+    render(<MemoryRouter initialEntries={["/game/L1/results"]}><AppRoutes /></MemoryRouter>);
+    expect(screen.getByText(/time's up/i)).toBeInTheDocument();
   });
 });
