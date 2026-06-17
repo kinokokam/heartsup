@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ScreenBackground } from "../components/ScreenBackground";
 import { Button } from "../components/Button";
@@ -39,14 +39,25 @@ export function GamePlay() {
 
   const gameLeft = secondsLeft(gameEndsAt);
   const turnLeft = secondsLeft(turnEndsAt);
+  // Latches so the 1s ticker doesn't re-fire the same RPC every second during the
+  // call -> realtime-update gap. The advance latch is keyed on turnEndsAt: it re-arms
+  // for free when a new turn starts (turnEndsAt changes); the finish latch fires once.
+  const advancedFor = useRef<string | null>(null);
+  const finished = useRef(false);
   useEffect(() => {
     if (status !== "playing") return;
-    if (gameLeft <= 0) { finishGame(id).catch(() => {}); return; }
+    if (gameLeft <= 0) {
+      if (!finished.current) { finished.current = true; finishGame(id).catch(() => {}); }
+      return;
+    }
     // Any member advances when the turn timer expires — not just the guesser — so a
     // disconnected guesser can't stall the game. advance_turn is server-validated
     // (rejects before turn_ends_at) and idempotent, so concurrent callers converge.
-    if (turnLeft <= 0) { advanceTurn(id).catch(() => {}); }
-  }, [status, gameLeft, turnLeft, id]);
+    if (turnLeft <= 0 && turnEndsAt && advancedFor.current !== turnEndsAt) {
+      advancedFor.current = turnEndsAt;
+      advanceTurn(id).catch(() => {});
+    }
+  }, [status, gameLeft, turnLeft, turnEndsAt, id]);
 
   if (loading) return <ScreenBackground><p>Loading…</p></ScreenBackground>;
 
