@@ -6,8 +6,9 @@ friends improvise a scenario from drawn keywords. Tilt **up** = guessed it (poin
 pass. Keyword combos come from an adaptive, community-trained coherence engine.
 
 This repo currently contains **Sub-project 0: Foundation & data pipeline**, **Sub-project 1:
-Auth + Profile + Game codes**, **Sub-project 2: Lobby & Realtime**, and **Sub-project 3: Core
-Game Loop**. See the design and plans under [`docs/superpowers/`](docs/superpowers/).
+Auth + Profile + Game codes**, **Sub-project 2: Lobby & Realtime**, **Sub-project 3: Core
+Game Loop**, and **Sub-project 4: Adaptive Coherence Engine**. See the design and plans under
+[`docs/superpowers/`](docs/superpowers/).
 
 ## Stack
 
@@ -100,6 +101,20 @@ into `rounds.keywords` (the lexicon tables aren't client-readable).
 3. The guesser's screen shows a big rating + keyword(s); tap Correct/Pass (or tilt on a phone).
    Scores update live on both screens; the spectator sees "X is guessing".
 4. When the timer expires, both land on the leaderboard with the winner highlighted.
+
+## Sub-project 4: Adaptive Coherence Engine
+
+Keyword-combo coherence learns from play. SP0 seeds `coherence` by embedding similarity; during a
+game each card's outcome nudges that combo's coherence — guessed raises it, passed lowers it
+(bounded EMA, clamped `[0,1]`), applied server-side inside `submit_outcome`. Combos players riff on
+get drawn more (the draw biases by coherence); combos they keep passing decay below the 0.15
+suppression floor and stop appearing. Coherence is never client-writable — it changes only through
+the `apply_feedback` path behind the guesser-scoped `submit_outcome` RPC.
+
+Verify the learning math against the live DB:
+```bash
+docker exec -i supabase_db_heartsup psql -U postgres -d postgres < supabase/tests/coherence.test.sql
+```
 
 ## Tests
 
