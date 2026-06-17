@@ -38,6 +38,22 @@ begin
   delete from public.word_pairs where id = v_id;
 end $$;
 
+-- ── Block 1b: the triple branch nudges word_triples (symmetry with pair) ──
+do $$
+declare v_id bigint; v_c real;
+begin
+  insert into public.word_triples (word_a_id, word_b_id, word_c_id, coherence)
+    values (1, 2, 3, 0.50) returning id into v_id;
+  perform public.apply_feedback(v_id, 'triple', '+');
+  select coherence into v_c from public.word_triples where id = v_id;
+  if abs(v_c - 0.525) > 0.0001 then raise exception 'triple guessed nudge wrong: %', v_c; end if;
+  perform public.apply_feedback(v_id, 'triple', '-');
+  select coherence into v_c from public.word_triples where id = v_id;
+  if v_c >= 0.525 then raise exception 'triple passed did not decay: %', v_c; end if;
+  raise notice 'OK: triple branch nudges word_triples up then down';
+  delete from public.word_triples where id = v_id;
+end $$;
+
 -- ── Block 2: end-to-end — submit_outcome(guessed) raises the drawn pair's coherence ──
 do $$
 declare h uuid := '00000000-0000-0000-0000-0000000000d1';
